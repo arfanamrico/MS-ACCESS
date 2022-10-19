@@ -1,0 +1,20 @@
+import pyodbc
+    
+#====untuk mengetahui driver nya==========
+#msa_drivers = [x for x in pyodbc.drivers() if 'ACCESS' in x.upper()]
+#print(f'MS-Access drivers : {msa_drivers}')
+
+#========cara connection ke mdb===========
+
+try:
+    con_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)}; DBQ=D:\Dokumen\DUMP\DUMP 3ID 20221017\DUMP 2G SMT\Dump.accdb;'
+    conn = pyodbc.connect(con_string)
+    print('connected to database')
+except pyodbc.Error as e:
+    print('error in connection', e)
+
+cursor = conn.cursor()
+cursor.execute(r"""select * into B_BTS from 
+                    [Excel 12.0 Xml; HDR=YES;IMEX=2;ACCDB=YES;DATABASE=D:\Dokumen\DUMP\DUMP 3ID 20221017\DUMP 2G SMT\A_BTS.xlsx].[A_BTS$]""") 
+cursor.commit()
+print('table T_BTS inserted')
