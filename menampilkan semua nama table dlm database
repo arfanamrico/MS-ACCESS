@@ -1,0 +1,4 @@
+
+cursor = conn.cursor()
+for i in cursor.tables(tableType='TABLE'):
+    print(i.table_name)
