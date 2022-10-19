@@ -1,3 +1,7 @@
 cursor.execute('select * from user')
 for row ini cursor.fetchall():
   print(row)
+
+selectdata dengan pandas
+df = pd.read_sql('SELECT A_BTS.BSCId, A_BTS.BCFId, A_BTS.BTSId, A_BTS.locationAreaIdLAC, A_BTS.cellId, A_BTS.name, A_ADCE.BSCId, A_ADCE.BCFId, A_ADCE.BTSId, A_ADCE.adjacentCellIdLac, A_ADCE.adjacentCellIdCI, A_ADCE.name FROM A_BTS INNER JOIN A_ADCE ON (A_BTS.BSCId = A_ADCE.BSCId) AND (A_BTS.BCFId = A_ADCE.BCFId) AND (A_BTS.BTSId = A_ADCE.BTSId);',conn)
+print(pd.DataFrame(df).info())
