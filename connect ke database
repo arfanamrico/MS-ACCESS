@@ -1,0 +1,7 @@
+#========cara connection ke mdb===========
+try:
+    con_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)}; DBQ=D:\Dokumen\DUMP\DUMP 3ID 20221017\DUMP_2G.mdb;'
+    conn = pyodbc.connect(con_string)
+    print('connected to database')
+except pyodbc.Error as e:
+    print('error in connection', e)
