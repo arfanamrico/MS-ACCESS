@@ -1,0 +1,3 @@
+cursor.execute('select * from user')
+for row ini cursor.fetchall():
+  print(row)
