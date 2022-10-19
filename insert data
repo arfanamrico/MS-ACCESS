@@ -1,0 +1,9 @@
+mydata = (
+(1, 'arfan', 'boss'),
+(2, 'ashif', 'owner'),
+(3, 'ashim', 'director'),
+)
+
+cursor.executemany('insert into users values (?, ?, ?)', mydata)
+conn.commit()
+print('data inserted')
