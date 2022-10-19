@@ -1,0 +1,5 @@
+id = 3
+
+cursor.execute('delete from users where id = ?', (id))
+conn.commint()
+print('data deleted')
