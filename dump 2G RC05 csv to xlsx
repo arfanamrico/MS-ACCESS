@@ -1,0 +1,977 @@
+import pandas as pd
+import os
+import pyodbc
+
+dirpath = r"D:\Dokumen\DUMP\DUMP 2G SMT RC05 20221020\DUMP 2G RC05"
+"""
+try:
+    con_string = r'DRIVER={Microsoft Access Driver (*.mdb, *.accdb)}; DBQ=D:\Dokumen\DUMP\DUMP 2G SMT RC05 20221020\DUMP 2G SMT\Dump2GSMT.accdb;'
+    conn = pyodbc.connect(con_string)
+    print('connected to database')
+except pyodbc.Error as e:
+    print('error in connection', e)
+
+cursor = conn.cursor()
+"""
+#===========A_BTS====================1
+def bts ():
+    data = pd.read_csv(path)
+    dfbts = pd.DataFrame(data)
+    dfbts[['PLMN','BSC','BCF','BTS']] = dfbts['DISTNAME'].str.split('/', expand=True)
+    dfbts['BSCId'] = dfbts['BSC'].str.split('-').str.get(1)
+    dfbts['BCFId'] = dfbts['BCF'].str.split('-').str.get(1)
+    dfbts['BTSId'] = dfbts['BTS'].str.split('-').str.get(1)
+    #dfbts['template_name'] = 	dfbts['template_set'] = 	dfbts['siteId'] = 	dfbts['siteCId'] = 	dfbts['applyRepeatedFacch'] = 	dfbts['beamHoppingThreshold'] = 	dfbts['carrierUnitConfiguration'] = 	dfbts['enableTemporaryOverpower'] = 	dfbts['extendedPagingEnabled'] = 	dfbts['facchBusyThreshold'] = 	dfbts['fastReturnToTdScdma'] = 	dfbts['idrCellType'] = 	dfbts['idrUsed'] = 	dfbts['intervalMeasReportSending'] = 	dfbts['oscEdgeMixedUsage'] = 	dfbts['rachBusyThreshold'] = 	dfbts['repeatedFacchInDl'] = 	dfbts['repeatedFacchInUl'] = 	dfbts['repeatedSacchInDl'] = 	dfbts['repeatedSacchInUl'] = 	dfbts['repeatedSacchRxLevThresholdDl'] = 	dfbts['repeatedSacchRxLevThresholdUl'] = 	dfbts['rxSigLevAdjust'] = 	dfbts['sdcchMeasReportSending'] = 	dfbts['tdscdmaNccrEnabled'] = 	dfbts['transportType'] = 	dfbts['txDiversityTimeShift'] = 	dfbts['txSigLevAdjust'] = 	dfbts['cellType'] = 	dfbts['oldDN'] = 	dfbts['siteTemplateDescription'] = 	dfbts['siteTemplateName'] = ''
+    dfbts['status'] = 'ACTUAL'
+    dfbts['last_modified'] = dfbts['DATETIME']
+    dfbts['last_actual_import'] = dfbts['DATETIME']
+    A_BTS = dfbts[['BSCId',	'BCFId',	'BTSId','notAllowedAccessClasses',	'plmnPermitted',	'frequencyBandInUse',	'gprsMsTxPwrMaxCCH1x00',	'minMsTxPower',	'msTxPwrMaxCCH1x00',	'msTxPwrMaxGSM1x00',	'name',	'adaptiveLaAlgorithm',	'adminState',	'allowIMSIAttachDetach',	'amrConfFrCodecModeSet',	'amrConfFrDlThreshold1',	'amrConfFrDlThreshold2',	'amrConfFrDlThreshold3',	'amrConfFrHysteresis1',	'amrConfFrHysteresis2',	'amrConfFrHysteresis3',	'amrConfFrInitCodecMode',	'amrConfFrStartMode',	'amrConfFrUlThreshold1',	'amrConfFrUlThreshold2',	'amrConfFrUlThreshold3',	'amrConfHrCodecModeSet',	'amrConfHrDlThreshold1',	'amrConfHrDlThreshold2',	'amrConfHrDlThreshold3',	'amrConfHrHysteresis1',	'amrConfHrHysteresis2',	'amrConfHrHysteresis3',	'amrConfHrInitCodecMode',	'amrConfHrStartMode',	'amrConfHrUlThreshold1',	'amrConfHrUlThreshold2',	'amrConfHrUlThreshold3',	'amrHoFrInHoThrDlRxQual',	'amrHoFrSupReuBadCiThr',	'amrHoFrSupReuGoodCiThr',	'amrHoFrThrDlRxQual',	'amrHoFrThrUlRxQual',	'amrHoHrInHoThrDlRxQual',	'amrHoHrSupReuBadCiThr',	'amrHoHrSupReuGoodCiThr',	'amrHoHrThrDlRxQual',	'amrHoHrThrUlRxQual',	'amrPocFrPcLThrDlRxQual',	'amrPocFrPcLThrUlRxQual',	'amrPocFrPcUThrDlRxQual',	'amrPocFrPcUThrUlRxQual',	'amrPocHrPcLThrDlRxQual',	'amrPocHrPcLThrUlRxQual',	'amrPocHrPcUThrDlRxQual',	'amrPocHrPcUThrUlRxQual',	'amrSegLoadDepTchRateLower',	'amrSegLoadDepTchRateUpper',	'amrWbFrCodecModeSet',	'amrWbFrHysteresis1',	'amrWbFrHysteresis2',	'amrWbFrThreshold1',	'amrWbFrThreshold2',	'bsIdentityCodeBCC',	'bsIdentityCodeNCC',	'btsIsHopping',	'btsLoadInSeg',	'btsLoadThreshold',	'btsMeasAver',	'btsSpLoadDepTchRateLower',	'btsSpLoadDepTchRateUpper',	'callReestablishmentAllowed',	'cellBarQualify',	'cellBarred',	'cellId',	'cellLoadForChannelSearch',	'cellNumberInBtsHw',	'cellReselectHysteresis',	'cellReselectOffset',	'cellReselectParamInd',	'cnThreshold',	'cs3Cs4Enabled',	'dedicatedGPRScapacity',	'defaultGPRScapacity',	'directGPRSAccessBts',	'diversityUsed',	'dlNoiseLevel',	'downwardGuardInterval',	'drInUse',	'drMethod',	'dssCIThreshold',	'dssCenterFrequency',	'dssLowPowerCIThreshold',	'dssLowPowerSharedDMALCount',	'dssMaximumFrequency',	'dssMinimumFrequency',	'dssNoOfLowerSharedFrequencies',	'dssNoOfUpperSharedFrequencies',	'dtmEnabled',	'dtrxPowerDownThreshold',	'dtrxPowerUpThreshold',	'dtxMode',	'earlySendingIndication',	'egprsEnabled',	'egprsInitMcsAckMode',	'egprsInitMcsUnAckMode',	'egprsLinkAdaptEnabled',	'egprsMaxBlerAckMode',	'egprsMaxBlerUnAckMode',	'egprsMeanBepOffset8psk',	'egprsMeanBepOffsetGmsk',	'emergencyCallRestricted',	'enableFlexibleSharedSpectrum',	'enablingwbAmrImprovement',	'failureThreshold',	'fastReturnToLTE',	'fddQMin',	'fddQOffset',	'forcedHrCiAverPeriod',	'forcedHrModeHysteresis',	'frExtLTE',	'gprsCapacityThroughputFactor',	'gprsEnabled',	'gprsMsTxpwrMaxCCH',	'gprsNonBCCHRxlevLower',	'gprsNonBCCHRxlevUpper',	'gprsRxlevAccessMin',	'gsmPriority',	'hcsPriorityClass',	'hcsThreshold',	'hoppingMode',	'hoppingSequenceNumber1',	'hoppingSequenceNumber2',	'ibhoGsmEnabled',	'ibhoWcdmaEnabled',	'idleStateBcchAllocListId',	'immediateSdcchHoEnabled',	'inactEndTimeHour',	'inactEndTimeMinute',	'inactStartTimeHour',	'inactStartTimeMinute',	'inactWeekDays',	'csAckDl',	'csAckUl',	'csUnackDl',	'csUnackUl',	'interferenceAveragingProcessAverPeriod',	'interferenceAveragingProcessBoundary0',	'interferenceAveragingProcessBoundary1',	'interferenceAveragingProcessBoundary2',	'interferenceAveragingProcessBoundary3',	'interferenceAveragingProcessBoundary4',	'interferenceAveragingProcessBoundary5',	'locationAreaIdLAC',	'locationAreaIdMCC',	'locationAreaIdMNC',	'lowPriorityThr',	'maioOffset',	'maioStep',	'masterBcf',	'maxGPRSCapacity',	'maxNumberOfRepetition',	'maxNumberRetransmission',	'maxQueueLength',	'maxTimeLimitDirectedRetry',	'measListUsedDuringMeas',	'measurementBCCHAllocation',	'minTimeLimitDirectedRetry',	'minimumCallThreshold',	'msMaxDistInCallSetup',	'msPriorityUsedInQueueing',	'msTxPwrMaxCCH',	'msTxPwrMaxGSM',	'multiBandCell',	'multiBandCellReporting',	'nbrOfSlotsSpreadTrans',	'newEstabCausesSupport',	'noOfBlocksForAccessGrant',	'noOfMFramesBetweenPaging',	'nonBCCHLayerOffset',	'nsei',	'nwName',	'operatorPool',	'pcuCsHopping',	'pcuCsNonHopping',	'pcuDlBlerCpHopping',	'pcuDlBlerCpNonHop',	'pcuDlLaRiskLevel',	'pcuIdentifier',	'pcuUlBlerCpHopping',	'pcuUlBlerCpNonHop',	'pcuUlLaRiskLevel',	'penaltyTime',	'powerOffset',	'precPagingUsage',	'preferBCCHfreqGPRS2',	'prioritySearchThr',	'psei',	'qSearchI',	'qSearchP',	'queuePriorityNonUrgentHo',	'queuePriorityUsed',	'queueingPriorityCall',	'queueingPriorityHandover',	'raReselectHysteresis',	'rac',	'rachDropRxLevelThreshold',	'radioLinkTimeout',	'radioLinkTimeoutAmr',	'radioLinkTimeoutAmrHr',	'reselectionAlgorithmHysteresis',	'rxLevAccessMin',	'scaleOrd',	'sectorId',	'segmentId',	'segmentName',	'smsCbUsed',	'stircEnabled',	'tchRateIntraCellHo',	'temporaryOffset',	'throughputFactor_cs1cs4dlcs',	'throughputFactor_cs1cs4ulcs',	'throughputFactor_mcs1mcs4ulcs',	'throughputFactor_mcs1mcs9dlcs',	'throughputFactor_mcs1mcs9ulcs',	'timeHysteresis',	'timeLimitCall',	'timeLimitHandover',	'timerPeriodicUpdateMs',	'trxPriorityInTchAlloc',	'ulNoiseLevel',	'upwardGuardInterval',	'usedMobileAllocation',	'utranQualRxLevelMargin',	'utranThresholdReselection',	'wcdmaPriority',	'angle',	'applyRepeatedFacch',	'carrierUnitConfiguration',	'enableTemporaryOverpower',	'facchBusyThreshold',	'intervalMeasReportSending',	'rachBusyThreshold',	'repeatedFacchInDl',	'repeatedFacchInUl',	'repeatedSacchInDl',	'repeatedSacchInUl',	'repeatedSacchRxLevThresholdDl',	'repeatedSacchRxLevThresholdUl',	'rxSigLevAdjust',	'sdcchMeasReportSending',	'txDiversityTimeShift',	'txSigLevAdjust',	'oldDN',	'insiteGateway',	'notificationOrigin',	'limForTriggeringOscDhrMultiplexing',	'amhLowerLoadThreshold',	'amhMaxLoadOfTgtCell',	'amhTrhoGuardTime',	'amhUpperLoadThreshold',	'antennaHopping',	'bcchTrxPower',	'beamHoppingThreshold',	'compositedMultiSiteCell',	'dfcaMode',	'dfcaUnsyncModeMaList',	'dldcEnabled',	'downgradeGuardTimeHSCSD',	'dssEnabling',	'eUTRANMultiratReporting',	'eUTRANReportingOffset',	'eUTRANReportingThreshold',	'eUTRANReportingThreshold2',	'ecGsm2TimeSlotRach',	'ecGsmBsRxPwrAccessMin',	'ecGsmBspwr',	'ecGsmBtThresholdDlForRla',	'ecGsmBtThresholdDlForSla',	'ecGsmBtThresholdUl',	'ecGsmBtThresholdUlMargin',	'ecGsmC1DeltaMax',	'ecGsmC1DeltaMin',	'ecGsmCC2RangeDl',	'ecGsmCC2RangeUl',	'ecGsmCC3RangeDl',	'ecGsmCC3RangeUl',	'ecGsmCCAccessAdaptation',	'ecGsmCCSelection',	'ecGsmCellSelectionRlaMargin',	'ecGsmDlMcsSelection',	'ecGsmDlSignalStrengthStepSize',	'ecGsmDynamicTSAllocation',	'ecGsmIoTCellBarredInfo',	'ecGsmIoTEnabledTrxs',	'ecGsmRxlevAccessMin',	'ecGsmThresholdMcs2',	'ecGsmThresholdMcs3',	'ecGsmThresholdMcs4',	'ecGsmUlMcsSelection',	'enableUlVoiceRepair',	'extendedBcchEnabled',	'extendedCellGprsEdgeEnabled',	'extendedCellLocationKeepPeriod',	'extendedPagingEnabled',	'fastPowerControlEnabled',	'fastReturnToTdScdma',	'fddQMinOffset',	'fddRscpMin',	'forcedAmrHrCiThreshold',	'forcedHrCiThreshold',	'freeTchLimit',	'gprsDlPcEnabled',	'hoppingSequenceNumber3',	'idrCellType',	'idrUsed',	'csExtAckDl',	'csExtAckUl',	'csExtUnackDl',	'csExtUnackUl',	'initMcsExtAckMode',	'initMcsExtUnackMode',	'interCellHandoverTimerWindow',	'limForTriggeringOscDfrMultiplexing',	'lowerDlRxLevThrForBCCHTrxPref',	'lowerLimitCellLoadHSCSD',	'lteNCCREnabled',	'mergedPgsmAndEgsmEnabled',	'minExhaustHSCSD',	'minHSCSDcapacityCell',	'minimumRxLevelForFastReturnToLte',	'mscHoCoEn',	'nbrTchForPrioritySubs',	'nobAccessLowerDlRxLevelThreshold',	'nobAccessUpperDlRxLevelThreshold',	'nobDlPowerOffset',	'nobUlPowerOffset',	'nominalDlTxPower',	'numberOfAdditionalRRHNodes',	'oscDfrRemultiplexingEnabled',	'oscDhrRemultiplexingEnabled',	'oscEdgeMixedUsage',	'pathLossOffsetDl',	'pathLossOffsetUl',	'pcuPswTbfDensityTarget',	'pcuPswTbfDowngradeThreshold',	'pcuPswTbfUpgradeThreshold',	'pcuUpToDate',	'peoDownlinkSignallingCounter',	'peoEnabled',	'priorityChUseIncomingHO',	'qSearchPEUTRAN',	'rachThreshCompCellNode',	'radioFrequencyColorCode',	'radioLinkTimeoutAmrHrUlIncreaseStep',	'radioLinkTimeoutAmrUlIncreaseStep',	'radioLinkTimeoutUlIncreaseStep',	'radiusExtension',	'reservationMethod',	'sbaLoadThreshold',	'smartBcchAllocationFreqList',	'superRadiusExtension',	'tdscdmaNccrEnabled',	'trafficTypesForTrunk',	'trau8kEnabledForDfr',	'trunkReservationUsed',	'ulInterferenceThreshold',	'underlayHoppingMode',	'underlayMaAllocationId',	'underlayMaioOffset',	'underlayMaioStep',	'upgradeGainHSCSD',	'upgradeGuardTimeHSCSD',	'upperDlRxLevThrForBCCHTrxPref',	'upperLimitCellLoadHSCSD',	'upperLimitRegularLoadHSCSD',	'siteTemplateName',	'VERSION',	'status',	'last_modified',	'last_actual_import']]
+    namafile = 'A_BTS.xlsx'
+    A_BTS.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('file A_BTS created !!!')
+
+#============ADCE===============2
+def adce ():
+    data = pd.read_csv(path)
+    dfadce = pd.DataFrame(data)
+    dfadce[['PLMN','BSC','BCF','BTS','ADCE']] = dfadce['DISTNAME'].str.split('/', expand=True)
+    dfadce['BSCId'] = dfadce['BSC'].str.split('-').str.get(1)
+    dfadce['BCFId'] = dfadce['BCF'].str.split('-').str.get(1)
+    dfadce['BTSId'] = dfadce['BTS'].str.split('-').str.get(1)
+    dfadce['template_name'] = 	dfadce['template_set'] = 	dfadce['siteId'] = 	dfadce['siteCId'] = 	dfadce['adjIdCi1'] = 	dfadce['adjIdCi2'] = 	dfadce['adjIdCi3'] = 	dfadce['adjIdCi4'] = 	dfadce['adjIdCi5'] = 	dfadce['ciEstWeight1'] = 	dfadce['ciEstWeight2'] = 	dfadce['ciEstWeight3'] = 	dfadce['ciEstWeight4'] = 	dfadce['ciEstWeight5'] = 	dfadce['adjIdLac1'] = 	dfadce['adjIdLac2'] = 	dfadce['adjIdLac3'] = 	dfadce['adjIdLac4'] = 	dfadce['adjIdLac5'] = 	dfadce['levelAdj1'] = 	dfadce['levelAdj2'] = 	dfadce['levelAdj3'] = 	dfadce['levelAdj4'] = 	dfadce['levelAdj5'] = 	dfadce['adjIdMCC1'] = 	dfadce['adjIdMCC2'] = 	dfadce['adjIdMCC3'] = 	dfadce['adjIdMCC4'] = 	dfadce['adjIdMCC5'] = 	dfadce['adjIdMNC1'] = 	dfadce['adjIdMNC2'] = 	dfadce['adjIdMNC3'] = 	dfadce['adjIdMNC4'] = 	dfadce['adjIdMNC5'] = 	dfadce['status'] = 	dfadce['last_modified'] = 	dfadce['last_actual_import'] = ''
+    dfadce['status'] = 'ACTUAL'
+    dfadce['last_modified'] = dfadce['DATETIME']
+    dfadce['last_actual_import'] = dfadce['DATETIME']
+    A_ADCE = dfadce[['BSCId',	'BCFId',	'BTSId',	'template_name',	'template_set',	'siteId',	'siteCId',	'adjCellBsicBcc',	'adjCellBsicNcc',	'adjCellLayer',	'adjacentCellIdCI',	'adjacentCellIdLac',	'adjacentCellIdMCC',	'adjacentCellIdMNC',	'adjacentOperatorPool',	'adjcIndex',	'amrDadlbTargetCell',	'bcchFrequency',	'borderRRHId',	'cellType',	'chainedAdjacentCell',	'dadlbTargetCell',	'drThreshold',	'dtmEnabled',	'dtmPowerBudgetMargin',	'enableDerivedHandoverPower',	'enableHoMarginLevQual',	'fastMovingThreshold',	'gprsEnabled',	'gprsMsTxPwrMaxCCH1x00',	'gprsMsTxpwrMaxCCH',	'gprsPenaltyTime',	'gprsRxlevAccessMin',	'gprsTemporaryOffset',	'hcsPriorityClass',	'hcsThreshold',	'hoLevelUmbrella',	'hoLoadFactor',	'hoMarginDelayTime',	'hoMarginLev',	'hoMarginPbgt',	'hoMarginQual',	'hoPriorityLevel',	'hoTargetArea',	'ibnaccState',	'msPwrOptLevel',	'msTxPwrMaxGSM',	'msTxPwrMaxGSM1x00',	'nccrEgprsPbgtMargin',	'nccrEgprsQualityMargin',	'nccrGprsPbgtMargin',	'nccrGprsQualityMargin',	'neighbourCellRanking',	'notificationOrigin',	'rac',	'reportingPriority',	'rxLevMinCell',	'synchronized',	'trhoTargetLevel',	'frequencyBandInUse',	'name',	'targetCellDN',	'adjIdCi1',	'adjIdCi2',	'adjIdCi3',	'adjIdCi4',	'adjIdCi5',	'ciEstWeight1',	'ciEstWeight2',	'ciEstWeight3',	'ciEstWeight4',	'ciEstWeight5',	'adjIdLac1',	'adjIdLac2',	'adjIdLac3',	'adjIdLac4',	'adjIdLac5',	'levelAdj1',	'levelAdj2',	'levelAdj3',	'levelAdj4',	'levelAdj5',	'adjIdMCC1',	'adjIdMCC2',	'adjIdMCC3',	'adjIdMCC4',	'adjIdMCC5',	'adjIdMNC1',	'adjIdMNC2',	'adjIdMNC3',	'adjIdMNC4',	'adjIdMNC5',	'status',	'last_modified',	'last_actual_import']]
+    namafile = 'A_ADCE.xlsx'
+    A_ADCE.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_ADCE created !!!')
+
+#============TRX===============3
+def trx ():
+    data = pd.read_csv(path)
+    dftrx = pd.DataFrame(data)
+    dftrx[['PLMN','BSC','BCF','BTS','TRX']] = dftrx['DISTNAME'].str.split('/', expand=True)
+    dftrx['BSCId'] = dftrx['BSC'].str.split('-').str.get(1)
+    dftrx['BCFId'] = dftrx['BCF'].str.split('-').str.get(1)
+    dftrx['BTSId'] = dftrx['BTS'].str.split('-').str.get(1)
+    dftrx['TRXId'] = dftrx['TRX'].str.split('-').str.get(1)
+    dftrx['template_name'] = 	dftrx['template_set'] = 	dftrx['siteId'] = 	dftrx['siteCId'] = 	dftrx['combinedSignalling'] = 	dftrx['horizonAssociatedTrxId'] = 	dftrx['horizonEdgeServiceType'] = 	dftrx['horizonPowerFinetune'] = 	dftrx['horizonTrxType'] = 	dftrx['metroTrxType'] = 	dftrx['name'] = 	dftrx['oldDN'] = ''
+    dftrx['status'] = 'ACTUAL'
+    dftrx['last_modified'] = dftrx['DATETIME']
+    dftrx['last_actual_import'] = dftrx['DATETIME']
+    A_TRX = dftrx[['BSCId',	'BCFId',	'BTSId',	'TRXId',	'template_name',	'template_set',	'siteId',	'siteCId',	'adminState',	'autoConfig',	'bbUnitSupportsEdge',	'channel0AdminState',	'channel0Maio',	'channel0Pcm',	'channel0Subslot',	'channel0Tsl',	'channel0Type',	'channel1AdminState',	'channel1Maio',	'channel1Pcm',	'channel1Subslot',	'channel1Tsl',	'channel1Type',	'channel2AdminState',	'channel2Maio',	'channel2Pcm',	'channel2Subslot',	'channel2Tsl',	'channel2Type',	'channel3AdminState',	'channel3Maio',	'channel3Pcm',	'channel3Subslot',	'channel3Tsl',	'channel3Type',	'channel4AdminState',	'channel4Maio',	'channel4Pcm',	'channel4Subslot',	'channel4Tsl',	'channel4Type',	'channel5AdminState',	'channel5Maio',	'channel5Pcm',	'channel5Subslot',	'channel5Tsl',	'channel5Type',	'channel6AdminState',	'channel6Maio',	'channel6Pcm',	'channel6Subslot',	'channel6Tsl',	'channel6Type',	'channel7AdminState',	'channel7Maio',	'channel7Pcm',	'channel7Subslot',	'channel7Tsl',	'channel7Type',	'combinedSignalling',	'daPool_ID',	'dfcaIndication',	'directAccessLevel',	'doublePowerTrxFaulty',	'dualTrxUsage',	'eTrxInd',	'gprsEnabledTrx',	'halfRateSupport',	'horizonAssociatedTrxId',	'horizonEdgeServiceType',	'horizonPowerFinetune',	'horizonTrxType',	'initialFrequency',	'lapdLinkName',	'lapdLinkNumber',	'mcpaTrxNumber',	'mcpaTrxPortId',	'mcpaTrxPosition',	'metroTrxType',	'notificationOrigin',	'numberOfTrxRfPowerLevels',	'optimumRxLevDL',	'optimumRxLevUL',	'preferredBcchMark',	'rfHoppingAllowed',	'serverTRXId',	'subslotsForSignalling',	'trxAbilities',	'trxDDUAssociation',	'trxFrequencyType',	'trxOscCapability',	'trxRfPower',	'trxShutdownGroup',	'trxStartingMode',	'tsc',	'name',	'oldDN',	'status',	'last_modified',	'last_actual_import']]
+    namafile = 'A_TRX.xlsx'
+    A_TRX.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_TRX created !!!')
+#============ADJL===============4
+def adjl ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','BTS','ADJL']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['BTSId'] = df['BTS'].str.split('-').str.get(1)
+    df['ADJLId'] = df['ADJL'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_ADJL = df[['BSCId',	'BCFId',	'BTSId',	'ADJLId','barredLteAdjCellGroup',	'barredLteAdjCellPattern',	'barredLteAdjCellPatternSense',	'earfcn',	'extOpId',	'lteAdjCellMcc',	'lteAdjCellMinBand',	'lteAdjCellMinRxLevel',	'lteAdjCellMnc',	'lteAdjCellPriority',	'lteAdjCellReselectLowerThr',	'lteAdjCellReselectUpperThr',	'lteAdjCellTac',	'lteAdjacentOperatorPool',	'name',	'barredLteAdjCellList',	'VERSION',	'status',	'last_modified',	'last_actual_import']]
+    namafile = 'A_ADJL.xlsx'
+    A_ADJL.to_excel(f'{dirpath}/{namafile}', index=False)
+    print(f'File {namafile} created !!!')
+#============ADJW===============5
+def adjw ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','BTS','ADJW']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['BTSId'] = df['BTS'].str.split('-').str.get(1)
+    df['ADJWId'] = df['ADJW'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_ADJW = df[['BSCId',	'BCFId',	'BTSId',	'ADJWId','name',	'targetCellDN',	'AdjwCId',	'intSystemDaEcioThr',	'isnccrQualityThr',	'lac',	'mcc',	'minEcnoThreshold',	'mnc',	'rncId',	'sac',	'scramblingCode',	'txDiversityInd',	'uarfcn',	'utranAdjacentOperatorPool',	'VERSION',	'status',	'last_modified',	'last_actual_import']]
+    namafile = 'A_ADJW.xlsx'
+    A_ADJW.to_excel(f'{dirpath}/{namafile}', index=False)
+    print(f'File {namafile} created !!!')
+#============ABDELM===============6
+def abdelm ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','MRBTS','BTSSCC','BTSSCG','ABDELM']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['MRBTSId'] = df['MRBTS'].str.split('-').str.get(1)
+    df['BTSSCCId'] = df['BTSSCC'].str.split('-').str.get(1)
+    df['BTSSCGId'] = df['BTSSCG'].str.split('-').str.get(1)
+    df['ABDELMId'] = df['ABDELM'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_ABDELM = df[['BSCId',	'BCFId',	'MRBTSId',	'BTSSCCId',	'BTSSCGId',	'ABDELMId',	'port',	'VERSION','status',	'last_modified',	'last_actual_import']]
+    namafile = 'A_ABDELM.xlsx'
+    A_ABDELM.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_ABDELM created !!!')
+#============ANTL===============7
+def antl ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','MRBTS','ANTL']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['MRBTSId'] = df['MRBTS'].str.split('-').str.get(1)
+    df['ANTLId'] = df['ANTL'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_ANTL = df[['BSCId',	'BCFId',	'MRBTSId',	'ANTLId','additionalRxGain',	'antId',	'feederVoltage',	'rModId',	'vswrMajorAlarm',	'vswrMinorAlarm',	'VERSION',	'status',	'last_modified',	'last_actual_import']]
+    namafile = 'A_ANTL.xlsx'
+    A_ANTL.to_excel(f'{dirpath}/{namafile}', index=False)
+    print(f'File {namafile} created !!!')
+#============BCF===============8
+def bcf ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_BCF = df[['BSCId',	'BCFId','name',	'abisInterfaceConnectionType',	'adminState',	'autoConfig',	'autoUnlAllowed',	'batteryBackupProcedure',	'bcchTrxBatbuTimer',	'bcfOutputInUse',	'bcfType',	'bcfUpToDate',	'bssTopSyncLimit',	'btsCuPlaneIpAddress',	'btsMPlaneIpAddress',	'btsSiteSubtype',	'btsSubnetMasklengthCUplane',	'btsSubnetMasklengthMplane',	'bu1AbisThroughputThreshold',	'bu2AbisThroughputThreshold',	'clockSource',	'dlCommittedInformationRate',	'etpBcfId',	'ext1ppsSyncSource',	'flexiEdgeAbisOverIpEthernetUsage',	'lapdLinkName',	'lapdLinkNumber',	'masterClockBcf',	'maxBtsMultiplexingWaitTime',	'maxEtpMultiplexingWaitTime',	'maximumMultiplexingPacketSize',	'normTrxBatbuTimer',	'normTrxBatbuTimer2',	'normTrxBatbuTimer3',	'paSatelliteUse',	'packetAbisBcfGroupId',	'packetAbisCongestionControl',	'packetDelayVariation',	'pl1ThresholdPacketLoss',	'pl2ThresholdPacketLoss',	'powerLicenceRequested',	'powerLicenceUsage',	'rfSharingState',	'rxDifferenceLimit',	'sctpBundlingOptimized',	'sctpBundlingTimer',	'synchEnabled',	'synchStatus',	'systemModuleHw',	'ulCommittedBurstSize',	'ulCommittedInformationRate',	'uplinkTrafficShaping',	'usedCsUdpMuxPort',	'usedEtpId',	'usedPsUdpMuxPort',	'vlanId',	'SBTSId',	'bcfPackVers',	'pcmPortId0',	'pcmPortId1',	'pcmPortId2',	'pcmPortId3',	'pcmPortId4',	'pcmPortId5',	'pcmPortId6',	'pcmPortId7',	'connectedMcpas_mcpaIdentityNumber_mcpaIdentityPortId_mcpaIdentityPosition_mcpaPower_mcpaRFSharingInfo',	'notificationOrigin',	'vswrAlarmThresholdLimit_antennaId_vswrAlarmMajorLimit_vswrAlarmMinorLimit',	'linkedMrsiteDN',	'externalAlarmDefinition_inputId_inputTextId_polarity_reportingRoute_severity',	'siteTemplateName',	'btsIpv4SubnetMasklengthCUplane',	'btsIpv4SubnetMasklengthMplane',	'VERSION','status',	'last_modified',	'last_actual_import']]
+    namafile = 'A_BCF.xlsx'
+    A_BCF.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_BCF created !!!')
+#============BTSNE===============9
+def btsne ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','MRBTS','BTSSCC','BTSSCG','BTSNE']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['MRBTSId'] = df['MRBTS'].str.split('-').str.get(1)
+    df['BTSSCCId'] = df['BTSSCC'].str.split('-').str.get(1)
+    df['BTSSCGId'] = df['BTSSCG'].str.split('-').str.get(1)
+    df['BTSNEId'] = df['BTSNE'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_BTSNE = df[['BSCId',	'BCFId','MRBTSId','BTSSCCId','BTSSCGId','BTSNEId','ambientAirTempOffset',	'bcfId',	'bcfType',	'bscId',	'bscName',	'btsSyncOutputFormat',	'btsSyncSource',	'climateControlProfiling',	'installationDate',	'installationNotes',	'installationPerson',	'rxds',	'siteId',	'siteName',	'timingLimitHysteresisMultiplier',	'lmuPhaseSync',	'loosePhaseSyncMode',	'maxBscTimeError',	'maxBtsTimeError',	'multiBscMode',	'VERSION','status','last_modified','last_actual_import']]
+    namafile = 'A_BTSNE.xlsx'
+    A_BTSNE.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_BTSNE created !!!')
+#============ETHLK===============10
+def ethlk ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','MRBTS','BTSSCC','BTSSCG','ETHLK']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['MRBTSId'] = df['MRBTS'].str.split('-').str.get(1)
+    df['BTSSCCId'] = df['BTSSCC'].str.split('-').str.get(1)
+    df['BTSSCGId'] = df['BTSSCG'].str.split('-').str.get(1)
+    df['ETHLKId'] = df['ETHLK'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_ETHLK = df[['BSCId','BCFId','MRBTSId','BTSSCCId','BTSSCGId','ETHLKId','VERSION','linkOAMEnabled','portID','status','last_modified','last_actual_import']]
+    namafile = 'A_ETHLK.xlsx'
+    A_ETHLK.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_ETHLK created !!!')
+#============ETHPRO===============11
+def ethpro ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','MRBTS','BTSSCC','BTSSCG','ETHPRO']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['MRBTSId'] = df['MRBTS'].str.split('-').str.get(1)
+    df['BTSSCCId'] = df['BTSSCC'].str.split('-').str.get(1)
+    df['BTSSCGId'] = df['BTSSCG'].str.split('-').str.get(1)
+    df['ETHPROId'] = df['ETHPRO'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_ETHPRO = df[['BSCId','BCFId','MRBTSId','BTSSCCId','BTSSCGId','ETHPROId','VERSION',	'autoEdgeEnabled',	'bridgeForwardDelay',	'bridgeHelloTime',	'bridgeMaxAge',	'bridgePriority',	'forceProtocolVersion',	'losTriggerEnabled',	'spanningTreeMode',	'transmitHoldCount','status','last_modified','last_actual_import']]
+    namafile = 'A_ETHPRO.xlsx'
+    A_ETHPRO.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_ETHPRO created !!!')
+#============ETHPRT===============12
+def ethprt ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','MRBTS','BTSSCC','BTSSCG','ETHPRT']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['MRBTSId'] = df['MRBTS'].str.split('-').str.get(1)
+    df['BTSSCCId'] = df['BTSSCC'].str.split('-').str.get(1)
+    df['BTSSCGId'] = df['BTSSCG'].str.split('-').str.get(1)
+    df['ETHPRTId'] = df['ETHPRT'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_ETHPRT = df[['BSCId','BCFId','MRBTSId','BTSSCCId','BTSSCGId','ETHPRTId','VERSION','ethernetMtuSize',	'monitoringEnabled',	'portInterfaceSettings_destinationEgressPort_destinationIngressPort_ethernetAutoNegEnabled_portClockSelectionMode_portEgressPolicingEnabled_portID_portInUse_portIngressPolicingEnabled_portLinkSpeed_portRole',	'portInterfaceSettings_destinationEgressPort_destinationIngressPort_ethernetAutoNegEnabled_portEgressPolicingEnabled_portID_portInUse_portIngressPolicingEnabled_portRole',	'portInterfaceSettings_destinationEgressPort_destinationIngressPort_portEgressPolicingEnabled_portID_portInUse_portIngressPolicingEnabled_portRole',	'portInterfaceSettings_destinationEgressPort_destinationIngressPort_portID_portInUse',	'portInterfaceSettings_destinationEgressPort_destinationIngressPort_ethernetAutoNegEnabled_portClockSelectionMode_portEgressPolicingEnabled_portID_portIngressPolicingEnabled_portInUse_portLinkSpeed_portRole_portType',	'portInterfaceSettings_destinationEgressPort_destinationIngressPort_ethernetAutoNegEnabled_portEgressPolicingEnabled_portID_portIngressPolicingEnabled_portInUse_portRole_portType','status','last_modified','last_actual_import']]
+    namafile = 'A_ETHPRT.xlsx'
+    A_ETHPRT.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_ETHPRT created !!!')
+#============ETHQOS===============13
+def ethqos ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','MRBTS','BTSSCC','BTSSCG','ETHQOS']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['MRBTSId'] = df['MRBTS'].str.split('-').str.get(1)
+    df['BTSSCCId'] = df['BTSSCC'].str.split('-').str.get(1)
+    df['BTSSCGId'] = df['BTSSCG'].str.split('-').str.get(1)
+    df['ETHQOSId'] = df['ETHQOS'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_ETHQOS = df[['BSCId','BCFId','MRBTSId','BTSSCCId','BTSSCGId','ETHQOSId','VERSION','dscpTrafficClassMapping_dscpValue_trafficClass',	'pBitsTrafficClassMapping_pBitValue_trafficClass',	'qosAwareEthSwitchingEnabled',	'trafficClassificationRule',	'vlanIdTrafficClassMapping_trafficClass_vlanId','status','last_modified','last_actual_import']]
+    namafile = 'A_ETHQOS.xlsx'
+    A_ETHQOS.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_ETHQOS created !!!')
+#============ETHSLC===============14
+def ethslc ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','MRBTS','BTSSCC','BTSSCG','ETHSLC']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['MRBTSId'] = df['MRBTS'].str.split('-').str.get(1)
+    df['BTSSCCId'] = df['BTSSCC'].str.split('-').str.get(1)
+    df['BTSSCGId'] = df['BTSSCG'].str.split('-').str.get(1)
+    df['ETHSLCId'] = df['ETHSLC'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_ETHSLC = df[['BSCId','BCFId','MRBTSId','BTSSCCId','BTSSCGId','ETHSLCId','VERSION','serviceLayerOamEnabled','status','last_modified','last_actual_import']]
+    namafile = 'A_ETHSLC.xlsx'
+    A_ETHSLC.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_ETHSLC created !!!')
+#============GPC===============15
+def gpc ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','BTS','GPC']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['BTSId'] = df['BTS'].str.split('-').str.get(1)
+    df['GPCId'] = df['GPC'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_GPC = df[['BSCId','BCFId','BTSId','GPCId','VERSION','nccrNumberZeroResults',	'nccrOtherPcuCellOffset',	'nccrRxlevIdleWinSize',	'nccrRxlevTraWinSize',	'qcTputThrModes_egprsDlRlcAckMode',	'qcTputThrModes_egprsUlRlcAckMode',	'qcTputThrModes_gprsDlRlcAckMode',	'qcTputThrModes_gprsUlRlcAckMode','status','last_modified','last_actual_import']]
+    namafile = 'A_GPC.xlsx'
+    A_GPC.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_GPC created !!!')
+#============HOC===============16
+def hoc ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','BTS','HOC']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['BTSId'] = df['BTS'].str.split('-').str.get(1)
+    df['HOCId'] = df['HOC'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_HOC = df[['BSCId','BCFId','BTSId','HOCId','VERSION','allAdjacentCellsAveraged',	'allInterfCellsAveraged',	'allUtranAdjAver',	'amhTrafficControlIUO',	'amhTrafficControlMCN',	'amhTrhoPbgtMargin',	'averagingWindowSizeAdjCell',	'ciEstMethod',	'ddeThresholdsLevNx',	'ddeThresholdsLevPx',	'ddeThresholdsLevRxLevel',	'ddeWindow',	'enaFastAveCallSetup',	'enaFastAveHo',	'enaFastAvePc',	'enaHierCellHo',	'enaTchAssSuperIuo',	'enableInterFrtIuoHo',	'enableIntraHoDl',	'enableIntraHoUl',	'enableMsDistance',	'enablePowerBudgetHo',	'enableSddchHandover',	'enableUmbrellaHo',	'erfdEnabled',	'erfdOver',	'failMoveThreshold',	'fddRepThr2',	'gsmPlmnPriorisation',	'hoAvaragingLevDLWeighting',	'hoAvaragingLevDlWindowSize',	'hoAveragingLevUlWeighting',	'hoAveragingLevUlWindowSize',	'hoAveragingQualDlWeighting',	'hoAveragingQualDlWindowSize',	'hoAveragingQualUlWeighting',	'hoAveragingQualUlWindowSize',	'hoPeriodPbgt',	'hoPeriodUmbrella',	'hoTLDlPx',	'hoTLDlRxLevel',	'hoTLUlNx',	'hoTLUlPx',	'hoTLUlRxLevel',	'hoTQDlNx',	'hoTQDlPx',	'hoTQDlRxQual',	'hoTQUlNx',	'hoTQUlPx',	'hoTQUlRxQual',	'hoThrInterferenceDlNx',	'hoThrInterferenceDlPx',	'hoThresholdsInterferenceDlRxLevel',	'hoThresholdsInterferenceULNx',	'hoThresholdsInterferenceULPx',	'hoThresholdsInterferenceULRxLevel',	'hoThresholdsLevDLNx',	'hoThresholdsRapidLevUl',	'hoThresholdsRapidLevUlN',	'interSystemDa',	'intfCellAvgWindowSize',	'intfCellNbrOfZeroResults',	'intraHoAmrFrToDfrRxQualThr',	'intraHoLoRxLevLimAmrHr',	'intraHoLoRxQualLimAmr',	'intraHoThrRxQualAmrToDhr',	'intraHoUpRxLevLimAmrHr',	'lowerCiLimit',	'lowerSpeedLimit',	'maxMsDistanceHoThreshold',	'minBsicDecodeTime',	'minIntBetweenHoReq',	'minIntBetweenUnsuccHoAttempt',	'minIntIuoHoReqBQ',	'minIntUnsuccIsHo',	'minIntUnsuccIuoHo',	'minMsDistanceHoThreshold',	'modifiedAveWinNCell',	'modifiedNoz',	'msDHoThrParamN8',	'msDistanceAveragingParamHreqave',	'msDistanceHoThresholdParamMsRangeMax',	'msDistanceHoThresholdParamP8',	'msSpeedAveraging',	'msSpeedDetectionState',	'msSpeedThresholdNx',	'msSpeedThresholdPx',	'multiratRep',	'noOfZeroResUtran',	'nonBcchLayerAccessThr',	'nonBcchLayerExitThr_nx',	'nonBcchLayerExitThr_px',	'numberOfZeroResults',	'oscDemultiplexingUlRxLevMargin',	'oscDfrDemultiplexingRxQualThr',	'oscDfrDemultiplexingUlRxLevMargin',	'oscDfrDemuxDlRxLevelThr',	'oscDfrMultiplexingRxQualThr',	'oscDfrMultiplexingUlRxLevThr',	'oscDfrMultiplexingUlRxLevWindow',	'oscDfrMuxDlRxLevelThr',	'oscDfrMuxDlRxQualThr',	'oscDhrDemultiplexingRxQualityThr',	'oscDhrDemuxDlRxLevelThr',	'oscDhrMultiplexingRxQualityThr',	'oscDhrMuxDlRxLevelThr',	'oscDhrMuxDlRxQualThr',	'oscMultiplexingUlRxLevelThr',	'oscMultiplexingUlRxLevelWindow',	'priorityAdjStep',	'qSearchC',	'reportingOffset',	'reportingOffset1800',	'reportingOffset1900',	'reportingOffset850',	'reportingOffset900',	'reportingThreshold',	'reportingThreshold1800',	'reportingThreshold1900',	'reportingThreshold850',	'reportingThreshold900',	'rxLevel',	'servingBandReporting',	'smaxMsDistanceHoThreshold',	'sminMsDistanceHoThreshold',	'superReuseBadCiThresholdCiRatio',	'superReuseBadCiThresholdNx',	'superReuseBadCiThresholdPx',	'superReuseBadRxLevThresholdNx',	'superReuseBadRxLevThresholdPx',	'superReuseBadRxLevThresholdRxLevel',	'superReuseEstMethod',	'superReuseGoodCiThresholdCiRatio',	'superReuseGoodCiThresholdNx',	'superReuseGoodCiThresholdPx',	'superReuseGoodRxLevThresholdNx',	'superReuseGoodRxLevThresholdPx',	'superReuseGoodRxLevThresholdRxLevel',	'thrDlRxQualDfr',	'thrDlRxQualDhr',	'thrUlRxQualDfr',	'thrUlRxQualDhr',	'upperSpeedLimit',	'utranAveragingNumber',	'utranHoThScTpdc',	'wcdmaRanCellPenalty','status','last_modified','last_actual_import']]
+    namafile = 'A_HOC.xlsx'
+    A_HOC.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_HOC created !!!')
+#============HW===============17
+def hw ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','HW']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['HWId'] = df['HW'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_HW = df[['BSCId','BCFId','HWId','VERSION','operationalState','systemTitle','vendorName','status','last_modified','last_actual_import']]
+    namafile = 'A_HW.xlsx'
+    A_HW.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_HW created !!!')
+#============LCELC===============18
+def lcelc ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','MRBTS','BTSSCC','LCELC']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['MRBTSId'] = df['MRBTS'].str.split('-').str.get(1)
+    df['BTSSCCId'] = df['BTSSCC'].str.split('-').str.get(1)
+    df['LCELCId'] = df['LCELC'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_LCELC = df[['BSCId','BCFId','MRBTSId','BTSSCCId','LCELCId','VERSION','anchorNodeId','perTrxPower','resourceList','txPowerPooling','status','last_modified','last_actual_import']]
+    namafile = 'A_LCELC.xlsx'
+    A_LCELC.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_LCELC created !!!')
+#============LCELL===============19
+def lcell ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','MRBTS','BTSSCL','LCELL']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['MRBTSId'] = df['MRBTS'].str.split('-').str.get(1)
+    df['BTSSCLId'] = df['BTSSCL'].str.split('-').str.get(1)
+    df['LCELLId'] = df['LCELL'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_LCELL = df[['BSCId','BCFId','MRBTSId','BTSSCLId','LCELLId','VERSION','resourceList_antlId_txRxUsage','status','last_modified','last_actual_import']]
+    namafile = 'A_LCELL.xlsx'
+    A_LCELL.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_LCELL created !!!')
+#============LNCEL===============20
+def lncel ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','MRBTS','LNBTS','LNCEL']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['MRBTSId'] = df['MRBTS'].str.split('-').str.get(1)
+    df['LNBTSId'] = df['LNBTS'].str.split('-').str.get(1)
+    df['LNCELId'] = df['LNCEL'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_LNCEL = df[['BSCId','BCFId','MRBTSId','LNBTSId','LNCELId','VERSION','dlChBw','earfcnDL','lcrId','pMax','status','last_modified','last_actual_import']]
+    namafile = 'A_LNCEL.xlsx'
+    A_LNCEL.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_LNCEL created !!!')
+#============PABTRS===============21
+def pabtrs ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','MRBTS','BTSSCC','BTSSCG','PABTRS']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['MRBTSId'] = df['MRBTS'].str.split('-').str.get(1)
+    df['BTSSCCId'] = df['BTSSCC'].str.split('-').str.get(1)
+    df['BTSSCGId'] = df['BTSSCG'].str.split('-').str.get(1)
+    df['PABTRSId'] = df['PABTRS'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_PABTRS = df[['BSCId','BCFId','MRBTSId','BTSSCCId','BTSSCGId','PABTRSId','VERSION','cPlaneVlanId',	'cuPlaneGatewayIpAddress',	'mPlaneGatewayIpAddress',	'mPlaneLocalIpAddress',	'mPlaneRemoteIpAddress',	'mPlaneSubnetMask',	'mPlaneVlanId',	'ucsSupervisionPktTimerValue',	'upsSupervisionPktTimerValue','status','last_modified','last_actual_import']]
+    namafile = 'A_PABTRS.xlsx'
+    A_PABTRS.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_PABTRS created !!!')
+#============POC===============22
+def poc ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','BTS','POC']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['BTSId'] = df['BTS'].str.split('-').str.get(1)
+    df['POCId'] = df['POC'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_POC = df[['BSCId','BCFId','BTSId','POCId','alpha',	'bepPeriod',	'bsTxPwrMax',	'bsTxPwrMax1x00',	'bsTxPwrMin',	'enableAla',	'gamma',	'maxPwrCompensation',	'minIntBetweenAla',	'pcALDlWeighting',	'pcALDlWindowSize',	'pcALUlWeighting',	'pcALUlWindowSize',	'pcAQLDlWeighting',	'pcAQLDlWindowSize',	'pcAQLUlWeighting',	'pcAQLUlWindowSize',	'pcControlEnabled',	'pcControlInterval',	'pcIncrStepSize',	'pcLTLevDlNx',	'pcLTLevDlPx',	'pcLTLevUlNx',	'pcLTLevUlPx',	'pcLTQual144Nx',	'pcLTQual144Px',	'pcLTQual144RxQual',	'pcLTQualDlNx',	'pcLTQualDlPx',	'pcLTQualDlRxQual',	'pcLTQualUlNx',	'pcLTQualUlPx',	'pcLTQualUlRxQual',	'pcLowerThresholdsLevDLRxLevel',	'pcLowerThresholsLevULRxLevel',	'pcRedStepSize',	'pcUTLevDlNx',	'pcUTLevDlPx',	'pcUTLevUlNx',	'pcUTLevUlPx',	'pcUTQualDlNx',	'pcUTQualDlPx',	'pcUTQualDlRxQual',	'pcUTQualUlNx',	'pcUTQualUlPx',	'pcUTQualUlRxQual',	'pcUpperThresholdsLevDLRxLevel',	'pcUpperThresholdsLevULRxLevel',	'powerDecrQualFactor',	'powerLimitAla',	'pwrDecrLimitBand0',	'pwrDecrLimitBand1',	'pwrDecrLimitBand2',	'tAvgT',	'tAvgW',	'transmitPowerReduction',	'derivedHoPowerSecurityMargin',	'estimatedDlInterference',	'maxDlPowerReduction',	'maxUlPowerReduction',	'pcLowerThresholdDlRxQualDhr',	'pcLowerThresholdUlRxQualDhr',	'pcUpperThresholdDlRxQualDhr',	'pcUpperThresholdUlRxQualDhr',	'bsTxPwrOffset',	'dlPcPowerReduction',	'dlPcWindowSize',	'maxTxPowCompCellNode',	'notificationOrigin',	'pcLowerThresholdDlRxQualDfr',	'pcLowerThresholdUlRxQualDfr',	'pcUpperThresholdDlRxQualDfr',	'pcUpperThresholdUlRxQualDfr',	'smartBcchAllocationPowerOffset',	'VERSION','status','last_modified','last_actual_import']]
+    namafile = 'A_POC.xlsx'
+    A_POC.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_POC created !!!')
+#============PUNIT===============23
+def punit ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','MRBTS','BTSSCC','BTSSCG','PUNIT']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['MRBTSId'] = df['MRBTS'].str.split('-').str.get(1)
+    df['BTSSCCId'] = df['BTSSCC'].str.split('-').str.get(1)
+    df['BTSSCGId'] = df['BTSSCG'].str.split('-').str.get(1)
+    df['PUNITId'] = df['PUNIT'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_PUNIT = df[['BSCId','BCFId','MRBTSId','BTSSCCId','BTSSCGId','PUNITId','VERSION','productType',	'unitId',	'unitType',	'serialNo','status','last_modified','last_actual_import']]
+    namafile = 'A_PUNIT.xlsx'
+    A_PUNIT.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_PUNIT created !!!')
+#============RMOD===============24
+def rmod ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','MRBTS','RMOD']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['MRBTSId'] = df['MRBTS'].str.split('-').str.get(1)
+    df['RMODId'] = df['RMOD'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_RMOD = df[['BSCId','BCFId','MRBTSId','RMODId','VERSION','connectionList_linkId_positionInChain_sModId',	'hwType',	'mcpaPower',	'moduleLocation',	'prodCode',	'serNum',	'suppressAmbientAlarmEnabled','status','last_modified','last_actual_import']]
+    namafile = 'A_RMOD.xlsx'
+    A_RMOD.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_RMOD created !!!')
+#============SCFVER===============25
+def scfver ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','MRBTS','BTSSCC','BTSSCG','SCFVER']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['MRBTSId'] = df['MRBTS'].str.split('-').str.get(1)
+    df['BTSSCCId'] = df['BTSSCC'].str.split('-').str.get(1)
+    df['BTSSCGId'] = df['BTSSCG'].str.split('-').str.get(1)
+    df['SCFVERId'] = df['SCFVER'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_SCFVER = df[['BSCId','BCFId','MRBTSId','BTSSCCId','BTSSCGId','SCFVERId','VERSION','scfMajorVersion',	'scfMinorVersion','status','last_modified','last_actual_import']]
+    namafile = 'A_SCFVER.xlsx'
+    A_SCFVER.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_SCFVER created !!!')
+#============SCTP===============26
+def sctp ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','MRBTS','BTSSCC','BTSSCG','SCTP']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['MRBTSId'] = df['MRBTS'].str.split('-').str.get(1)
+    df['BTSSCCId'] = df['BTSSCC'].str.split('-').str.get(1)
+    df['BTSSCGId'] = df['BTSSCG'].str.split('-').str.get(1)
+    df['SCTPId'] = df['SCTP'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_SCTP = df[['BSCId','BCFId','MRBTSId','BTSSCCId','BTSSCGId','SCTPId','VERSION','ackTimerIUA',	'bundlingEnabled',	'hbInterval',	'initRTO',	'maxRTO',	'maxRetransAssoc',	'maxRetransPath',	'minRTO',	'minSctpPort',	'periodSACK','status','last_modified','last_actual_import']]
+    namafile = 'A_SCTP.xlsx'
+    A_SCTP.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_SCTP created !!!')
+#============SMOD===============27
+def smod ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','MRBTS','SMOD']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['MRBTSId'] = df['MRBTS'].str.split('-').str.get(1)
+    df['SMODId'] = df['SMOD'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_SMOD = df[['BSCId','BCFId','MRBTSId','SMODId','VERSION','linkList_linkId_radioMaster',	'moduleLocation',	'symmRFAllocEnabled',	'syncHubEnabled',	'syncMaster',	'technology',	'tempSyncMasterRecovTime',	'tempSyncMasterTriggerTime',	'prodCode',	'serNum','status','last_modified','last_actual_import']]
+    namafile = 'A_SMOD.xlsx'
+    A_SMOD.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_SMOD created !!!')
+#============SUBRACK===============28
+def subrack ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','HW','SUBRACK']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['HWId'] = df['HW'].str.split('-').str.get(1)
+    df['SUBRACKId'] = df['SUBRACK'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_SUBRACK = df[['BSCId','BCFId','HWId','SUBRACKId','VERSION','locationName','subrackSpecificType',	'vendorName','version','status','last_modified','last_actual_import']]
+    namafile = 'A_SUBRACK.xlsx'
+    A_SUBRACK.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_SUBRACK created !!!')
+#============SYNC===============29
+def sync ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','MRBTS','BTSSCC','BTSSCG','SYNC']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['MRBTSId'] = df['MRBTS'].str.split('-').str.get(1)
+    df['BTSSCCId'] = df['BTSSCC'].str.split('-').str.get(1)
+    df['BTSSCGId'] = df['BTSSCG'].str.split('-').str.get(1)
+    df['SYNCId'] = df['SYNC'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_SYNC = df[['BSCId','BCFId','MRBTSId','BTSSCCId','BTSSCGId','SYNCId','syncSources_interface_priorityID_syncType',	'twoMHzClockOutput',	'syncSources_priorityID_syncType',	'VERSION','status','last_modified','last_actual_import']]
+    namafile = 'A_SYNC.xlsx'
+    A_SYNC.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_SYNC created !!!')
+#============TRE===============30
+def tre ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','TRE']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['TREId'] = df['TRE'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_TRE = df[['BSCId','BCFId','TREId','VERSION','q1Address','unitType','status','last_modified','last_actual_import']]
+    namafile = 'A_TRE.xlsx'
+    A_TRE.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_TRE created !!!')
+#============TRENE===============31
+def trene ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','MRBTS','BTSSCC','BTSSCG','TRENE']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['MRBTSId'] = df['MRBTS'].str.split('-').str.get(1)
+    df['BTSSCCId'] = df['BTSSCC'].str.split('-').str.get(1)
+    df['BTSSCGId'] = df['BTSSCG'].str.split('-').str.get(1)
+    df['TRENEId'] = df['TRENE'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_TRENE = df[['BSCId','BCFId','MRBTSId','BTSSCCId','BTSSCGId','TRENEId','abisMappingDownloadEnabled',	'abisSignalTiming',	'piuType',	'trsMode',	'correctMacAddr',	'hwVariant',	'VERSION','status','last_modified','last_actual_import']]
+    namafile = 'A_TRENE.xlsx'
+    A_TRENE.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_TRENE created !!!')
+#============UNIT===============32
+def unit ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','MRBTS','BTSSCC','BTSSCG','UNIT']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['MRBTSId'] = df['MRBTS'].str.split('-').str.get(1)
+    df['BTSSCCId'] = df['BTSSCC'].str.split('-').str.get(1)
+    df['BTSSCGId'] = df['BTSSCG'].str.split('-').str.get(1)
+    df['UNITId'] = df['UNIT'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_UNIT = df[['BSCId','BCFId','MRBTSId','BTSSCCId','BTSSCGId','UNITId','VERSION','platformInterfaceSettings_interfaceCRCUsage_interfaceID_interfaceInUse_interfaceName_interfaceType',	'availabilityStatus',	'identificationCode',	'operationalState',	'position',	'serialNumber',	'unitId',	'unitType',	'vendorName',	'version','status','last_modified','last_actual_import']]
+    namafile = 'A_UNIT.xlsx'
+    A_UNIT.to_excel(f'{dirpath}/{namafile}', index=False)
+    print('table A_UNIT created !!!')
+#============ABMAP===============33
+def abmap ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','MRBTS','BTSSCC','BTSSCG','ABMAP']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['MRBTSId'] = df['MRBTS'].str.split('-').str.get(1)
+    df['BTSSCCId'] = df['BTSSCC'].str.split('-').str.get(1)
+    df['BTSSCGId'] = df['BTSSCG'].str.split('-').str.get(1)
+    df['ABMAPId'] = df['ABMAP'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_ABMAP = df[['BSCId','BCFId','MRBTSId','BTSSCCId','BTSSCGId','ABMAPId','VERSION','abisSignalSourceAllocations_1_abisSigId_abisSigPos_abisSigTS_abisSigType_abisSigWidth_abisTrafficTS',	'abisSignalSourceAllocations_2_abisSigId_abisSigPos_abisSigTS_abisSigType_abisSigWidth_abisTrafficTS',	'edapAllocations_edapEndTS_edapStartTS_trxId','status','last_modified','last_actual_import']]
+    namafile = 'A_ABMAP.xlsx'
+    A_ABMAP.to_excel(f'{dirpath}/{namafile}', index=False)
+    print(f'File {namafile} created !!!')
+#============ABTER===============34
+def abter ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','MRBTS','BTSSCC','BTSSCG','ABTER']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['MRBTSId'] = df['MRBTS'].str.split('-').str.get(1)
+    df['BTSSCCId'] = df['BTSSCC'].str.split('-').str.get(1)
+    df['BTSSCGId'] = df['BTSSCG'].str.split('-').str.get(1)
+    df['ABTERId'] = df['ABTER'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_ABTER = df[['BSCId','BCFId','MRBTSId','BTSSCCId','BTSSCGId','ABTERId','VERSION','omusigPos',	'omusigSB',	'omusigTS',	'omusigWidth',	'referenceTimeslots_extraSB_refSigId_refTSatBTS','status','last_modified','last_actual_import']]
+    namafile = 'A_ABTER.xlsx'
+    A_ABTER.to_excel(f'{dirpath}/{namafile}', index=False)
+    print(f'File {namafile} created !!!')
+#============BAL===============35
+def bal ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BAL']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BALId'] = df['BAL'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_BAL = df[['BSCId','BALId','VERSION','frequency','frequencyBandInUse','status','last_modified','last_actual_import']]
+    namafile = 'A_BAL.xlsx'
+    A_BAL.to_excel(f'{dirpath}/{namafile}', index=False)
+    print(f'File {namafile} created !!!')
+#============BSC===============36
+def bsc ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_BSC = df[['BSCId','VERSION','csNriList_cnId_csMSCState_csNasNodeMethod_csNullNri_csWeightFactor_defaultSignallingPointCode_mcc_mnc_nriList1_nriList10_nriList2_nriList3_nriList4_nriList5_nriList6_nriList7_nriList8_nriList9_operatorId_signallingPointCode',	'bscOptions',	'dcsMacrocellThreshold',	'dcsMicrocellThreshold',	'name',	'neSwRelease',	'AICsUplaneDscpPhbTcInMgw',	'AIfAf1WfqWeight',	'AIfAf2WfqWeight',	'AIfAf3WfqWeight',	'AIfAf4WfqWeight',	'AIfBeWfqWeight',	'AIfCsUplaneDscpPhbTcInBss',	'a54CipheringEnabled',	'abisCplaneDscpMap',	'abisMplaneDscpMap',	'abisUplaneCsDscpMap',	'abisUplanePsDscpMap',	'adjCellFreqsInMeasBAInfo',	'alrmChFail',	'alrmNoOfSei',	'alrmSchFail',	'alrmSdcch',	'alrmSeizReq',	'alrmTch',	'amrConfInHandovers',	'amrLoadDepTchRateLower',	'amrLoadDepTchRateUpper',	'amrSetGradesEnabl',	'ansiEnvironment',	'batteryBackupTimer',	'bcsuLoadThr',	'bhTimerDurStartReact',	'bhTimerDurStopReact',	'bscActiveSw',	'bscSwReleaseVersion',	'bscType',	'btsLoadDepTchRateLower',	'btsLoadDepTchRateUpper',	'cPlanePacketDropPeriod',	'callReleaseLimit',	'cdId',	'clockSyncDscpMap',	'csForcedMode',	'csLoadBalancingValue',	'csNriLength',	'csPacketDropPeriod',	'csUdpMuxPort',	'delayHoPcEmergencyCalls',	'dfcaAmrFrConnection_softBlockingCn',	'dfcaAmrHrConnection_softBlockingCn',	'dfcaFrConnection_softBlockingCn',	'dfcaHrConnection_softBlockingCn',	'disableExtDr',	'disableIntHo',	'dssHPThreshCount',	'dssLPThreshCount',	'dssOffsetSoftBlockingCILimit',	'dtmFragmentationPenalty',	'dtrxPowerDownSupervisionPeriod',	'emerCallOnFacch',	'enableFastGSMBTSSwDownload',	'enableLowPowerCallHandling',	'enableNwTrafficSeparation',	'enablingAdaptiveIntCodeSchm',	'enhCallReEstablishment',	'environment',	'extLteOpMCC',	'extLteOpMNC',	'extraTrxBcsuNumber',	'extraTrxMaxTrxInBcsu',	'fcdRelPriThres',	'fepInPcHoUse',	'frTchALim',	'freeTSLsCsDowngrade',	'freeTSLsCsUpgrade',	'freqInMeasBAInfo',	'gprsTerritoryCalc',	'gsmMacrocellThreshold',	'gsmMicrocellThreshold',	'hoPrefOrderInterfDl',	'hoPrefOrderInterfUl',	'hrTchALim',	'ibhoGsmCellsAnoMs',	'ibhoWcdmaCellsAnoMs',	'improvedULPowerControl',	'inactCriteria',	'inactEventsPerHour',	'incomeRateThreshold',	'initAmrChannelRate',	'initialAMRCodecType',	'internalHoToExternal',	'intraSegSdcchHoGuard',	'ishoPreferredForNonDtmMs',	'lapdLoadThr',	'loadChkwbAmrHo',	'loadRateChSearch',	'lteMode',	'mPlanePacketDropPeriod',	'maxBcfCapacity',	'maxBtsCapacity',	'maxHldSdcch',	'maxHldTch',	'maxOnHiIf',	'maxTchTransactionRate',	'maxTrxCapacityHw',	'maxTrxCapacityReal',	'meanBepLimitUL_Prof0_2tsl',	'meanBepLimitUL_Prof0_3tsl',	'meanBepLimitUL_Prof0_4tsl',	'meanBepLimitUL_Prof1_2tsl',	'meanBepLimitUL_Prof1_3tsl',	'meanBepLimitUL_Prof1_4tsl',	'meanBepLimitUL_Prof2_3tsl',	'meanBepLimitUL_Prof2_4tsl',	'measPrdCh',	'measPrdFail',	'measPrdSdcch',	'measTchMhold',	'minHiIf',	'minHldTch',	'msDistanceBehaviour',	'msSpeedC11',	'msSpeedC12',	'naccUsage',	'nccrControlMode',	'nccrIdleModeRepPeriod',	'nccrNeighborCellPenalty',	'nccrReturnOldCellTime',	'nccrTargetCellPenalty',	'nccrTraModeRepPeriod',	'noOfPrefCells',	'nokBtsOffHour',	'nokBtsOffMinute',	'nokBtsOnHour',	'nokBtsOnMinute',	'ordinaryCallOnFacch',	'packageId',	'packetLossTimerDurStartReact',	'packetLossTimerDurStopReact',	'pagingAnsOnFacch',	'pcuMaxNoDLtbfInCH',	'pcuMaxNoULtbfInCH',	'pcuSelectionThresh',	'prdHighIf',	'prdNokBts',	'precPageEnRepage',	'precPageExpandDelay',	'precPageMscDel',	'precPageRecLife',	'precPageTmsiOpt',	'preemptionUsageInHO',	'psPacketDropPeriod',	'psUdpMuxPort',	'pseOverlAlarmThresh',	'publicServCount',	'qcActionTriggerThr_realloca',	'reestablishOnFacch',	'rlcAckBlerLimit',	'rlcUnackBlerLimit',	'rnwConfId',	'rnwFallbackConfId',	'rnwPlanConfId',	'rnwPlanDatabaseState',	'rtsl0PrefInTCHAlloc',	'rxAntSupPer',	'rxLevBalance',	'rxLevelBasedTchAccess',	'rxqualLimitUL_Prof0_2tsl',	'rxqualLimitUL_Prof0_3tsl',	'rxqualLimitUL_Prof0_4tsl',	'rxqualLimitUL_Prof1_2tsl',	'rxqualLimitUL_Prof1_3tsl',	'rxqualLimitUL_Prof1_4tsl',	'rxqualLimitUL_Prof2_3tsl',	'rxqualLimitUL_Prof2_4tsl',	'schedStepSizeDlHighPrior',	'schedStepSizeDlLowPrior',	'schedStepSizeDlNormPrior',	'schedStepSizeUlPrior1',	'schedStepSizeUlPrior2',	'schedStepSizeUlPrior3',	'schedStepSizeUlPrior4',	'schedulingWeight_backgroundARP1',	'schedulingWeight_backgroundARP2',	'schedulingWeight_backgroundARP3',	'sdcchAlLimit',	'signallingPointCodeIN0',	'signallingPointCodeIN1',	'signallingPointCodeNA0',	'signallingPointCodeNA1',	'siteSupportDscpMap',	'slowAmrLaEnabled',	'supervisionPeriod',	'tchRateInternalHo',	'tchTransactionCount',	'terrUpdGuardTGprs',	'timeLimitWPS',	'timeLimitWPSHO',	'triggerMeasPeriod',	'tsAf1Wfq',	'tsAf2Wfq',	'tsAf3Wfq',	'tsAf4Wfq',	'tsBeWfq',	'variableDlStepSize',	'vpAf1',	'vpAf2',	'vpAf3',	'vpAf4',	'vpBe',	'vpEf',	'waitTimeforClassmarkChange',	'wcdmaFddNccrEnabled',	'wcdmaFddNccrPreferred',	'wcdmaRanSaiPenalty',	'wpsPrefCapa',	'wpsPriCapa',	'amhLowerLoadThreshold',	'amhMaxLoadOfTgtCell',	'amhTrhoGuardTime',	'amhUpperLoadThreshold',	'amrPpcDlFrLowerThreshold1',	'amrPpcDlFrLowerThreshold2',	'amrPpcDlFrLowerThreshold3',	'amrPpcDlFrLowerThreshold4',	'amrPpcDlFrUpperThreshold1',	'amrPpcDlFrUpperThreshold2',	'amrPpcDlFrUpperThreshold3',	'amrPpcDlFrUpperThreshold4',	'amrPpcDlHrLowerThreshold1',	'amrPpcDlHrLowerThreshold2',	'amrPpcDlHrLowerThreshold3',	'amrPpcDlHrLowerThreshold4',	'amrPpcDlHrUpperThreshold1',	'amrPpcDlHrUpperThreshold2',	'amrPpcDlHrUpperThreshold3',	'amrPpcDlHrUpperThreshold4',	'amrPpcUlFrLowerThreshold1',	'amrPpcUlFrLowerThreshold2',	'amrPpcUlFrLowerThreshold3',	'amrPpcUlFrLowerThreshold4',	'amrPpcUlFrUpperThreshold1',	'amrPpcUlFrUpperThreshold2',	'amrPpcUlFrUpperThreshold3',	'amrPpcUlFrUpperThreshold4',	'amrPpcUlHrLowerThreshold1',	'amrPpcUlHrLowerThreshold2',	'amrPpcUlHrLowerThreshold3',	'amrPpcUlHrLowerThreshold4',	'amrPpcUlHrUpperThreshold1',	'amrPpcUlHrUpperThreshold2',	'amrPpcUlHrUpperThreshold3',	'amrPpcUlHrUpperThreshold4',	'dldcOffsefPcu2e',	'pcuPoolReallocationPeriod',	'pcuPoolReallocationStartTimeHour',	'pcuPoolReallocationStartTimeMinute',	'pcuPoolReallocationWeekdays',	'pcuSelAlgWeightMsAmount',	'pcuSelAlgWeightNeighbourAmount',	'pcuSelAlgWeightPsTrafficLoad',	'sacchRepeatWindow',	'AIfCsUplaneDscpPhbTcInMgw',	'tmAbisCplane',	'tmAbisMplane',	'tmAbisUplaneCs',	'tmAbisUplanePs',	'tmClockSync',	'tmSiteSupport','status','last_modified','last_actual_import']]
+    namafile = 'A_BSC.xlsx'
+    A_BSC.to_excel(f'{dirpath}/{namafile}', index=False)
+    print(f'File {namafile} created !!!')
+#============CABINET===============37
+def cabinet ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','HW','CABINET']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['HWId'] = df['HW'].str.split('-').str.get(1)
+    df['CABINETId'] = df['CABINET'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_CABINET = df[['BSCId','HWId','CABINETId','VERSION','cabinetType',	'identificationCode',	'interchangeability',	'locationName',	'serialNumber',	'vendorName',	'version','status','last_modified','last_actual_import']]
+    namafile = 'A_CABINET.xlsx'
+    A_CABINET.to_excel(f'{dirpath}/{namafile}', index=False)
+    print(f'File {namafile} created !!!')
+#============CARTRIDGE===============38
+def cartridge ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','HW','CABINET','CARTRIDGE']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['HWId'] = df['HW'].str.split('-').str.get(1)
+    df['CABINETId'] = df['CABINET'].str.split('-').str.get(1)
+    df['CARTRIDGEId'] = df['CARTRIDGE'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_CARTRIDGE = df[['BSCId','HWId','CABINETId','CARTRIDGEId','VERSION','cartridgeType',	'identificationCode',	'interchangeability',	'locationName',	'serialNumber',	'vendorName',	'version','status','last_modified','last_actual_import']]
+    namafile = 'A_CARTRIDGE.xlsx'
+    A_CARTRIDGE.to_excel(f'{dirpath}/{namafile}', index=False)
+    print(f'File {namafile} created !!!')
+#============DAP===============39
+def dap ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','DAP']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['DAPId'] = df['DAP'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_DAP = df[['BSCId','DAPId','VERSION','bcsuID',	'firstTSL',	'lastTSL',	'logicalBCSUAddress',	'pcmCircuit_ID',	'pcuID',	'psei','status','last_modified','last_actual_import']]
+    namafile = 'A_DAP.xlsx'
+    A_DAP.to_excel(f'{dirpath}/{namafile}', index=False)
+    print(f'File {namafile} created !!!')
+#============ETP===============40
+def etp ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','ETP']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['ETPId'] = df['ETP'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_ETP = df[['BSCId','ETPId','VERSION','connectedPcus_bcsuID_pcuID',	'etpGroupId',	'etpType','status','last_modified','last_actual_import']]
+    namafile = 'A_ETP.xlsx'
+    A_ETP.to_excel(f'{dirpath}/{namafile}', index=False)
+    print(f'File {namafile} created !!!')
+#============FUUNIT===============41
+def fuunit ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','HW','FUUNIT']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['HWId'] = df['HW'].str.split('-').str.get(1)
+    df['FUUNITId'] = df['FUUNIT'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_FUUNIT = df[['BSCId','HWId','FUUNITId','VERSION','functionalUnitType',	'supportedByUnit','status','last_modified','last_actual_import']]
+    namafile = 'A_FUUNIT.xlsx'
+    A_FUUNIT.to_excel(f'{dirpath}/{namafile}', index=False)
+    print(f'File {namafile} created !!!')
+#============LAPD===============42
+def lapd ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','LAPD']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['LAPDId'] = df['LAPD'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_LAPD = df[['BSCId','LAPDId','VERSION','bitRate',	'abisSigChannelTimeSlotPcm',	'abisSigChannelTimeSlotTsl',	'adminState',	'dChannelType',	'logicalBCSUAddress',	'name',	'parameterSetNumber',	'sapi',	'tei',	'associationName',	'streamId',	'abisSigChannelSubSlot','status','last_modified','last_actual_import']]
+    namafile = 'A_LAPD.xlsx'
+    A_LAPD.to_excel(f'{dirpath}/{namafile}', index=False)
+    print(f'File {namafile} created !!!')
+#============LUAC===============43
+def luac ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','BCF','MRBTS','BTSSCC','BTSSCG','LUAC']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['BCFId'] = df['BCF'].str.split('-').str.get(1)
+    df['MRBTSId'] = df['MRBTS'].str.split('-').str.get(1)
+    df['BTSSCCId'] = df['BTSSCC'].str.split('-').str.get(1)
+    df['BTSSCGId'] = df['BTSSCG'].str.split('-').str.get(1)
+    df['LUACId'] = df['LUAC'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_LUAC = df[['BSCId','BCFId','MRBTSId','BTSSCCId','BTSSCGId','LUACId','VERSION','btsAccountLockoutDuration',	'btsFailedLoginCountingPeriod',	'btsMaxFailedLoginAttempts',	'btsSessionLoginDelay',	'emIdleSessionTime',	'pwdAgeing','status','last_modified','last_actual_import']]
+    namafile = 'A_LUAC.xlsx'
+    A_LUAC.to_excel(f'{dirpath}/{namafile}', index=False)
+    print(f'File {namafile} created !!!')
+#============MAL===============44
+def mal ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','MAL']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['MALId'] = df['MAL'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_MAL = df[['BSCId','MALId','VERSION','frequency',	'frequencyBandInUse','status','last_modified','last_actual_import']]
+    namafile = 'A_MAL.xlsx'
+    A_MAL.to_excel(f'{dirpath}/{namafile}', index=False)
+    print(f'File {namafile} created !!!')
+#============MBAL===============45
+def mbal ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','MBAL']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['MBALId'] = df['MBAL'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_MBAL = df[['BSCId','MBALId','VERSION','frequencyBandInUse',	'measBAListFreqs','status','last_modified','last_actual_import']]
+    namafile = 'A_MBAL.xlsx'
+    A_MBAL.to_excel(f'{dirpath}/{namafile}', index=False)
+    print(f'File {namafile} created !!!')
+#============NSE===============46
+def nse ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','NSE']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['NSEId'] = df['NSE'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_NSE = df[['BSCId','NSEId','VERSION','localUdpPort',	'nseCapacity',	'nseNriMask',	'nseStatus',	'nseType',	'operatorId',	'peoMode',	'pfcFeatureMode',	'psNriList',	'psNullNri',	'psSgsnLoadBalancing',	'psei','status','last_modified','last_actual_import']]
+    namafile = 'A_NSE.xlsx'
+    A_NSE.to_excel(f'{dirpath}/{namafile}', index=False)
+    print(f'File {namafile} created !!!')
+#============NSVL===============47
+def nsvl ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','NSVL']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['NSVLId'] = df['NSVL'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_NSVL = df[['BSCId','NSVLId','VERSION','ipAddressValue',	'ipAddressVersion',	'localUdpPort',	'nsEntityId',	'nsVirtualConnectionName',	'nseCapacity',	'operatorId',	'preconfSgsnIpEpInd',	'psei',	'udpPort','status','last_modified','last_actual_import']]
+    namafile = 'A_NSVL.xlsx'
+    A_NSVL.to_excel(f'{dirpath}/{namafile}', index=False)
+    print(f'File {namafile} created !!!')
+#============OPERTR===============48
+def opertr ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','OPERTR']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['OPERTRId'] = df['OPERTR'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_OPERTR = df[['BSCId','OPERTRId','VERSION','csNullNri',	'operatorTag',	'primaryMobileCountryCode',	'primaryMobileNetworkCode',	'psNullNri','status','last_modified','last_actual_import']]
+    namafile = 'A_OPERTR.xlsx'
+    A_OPERTR.to_excel(f'{dirpath}/{namafile}', index=False)
+    print(f'File {namafile} created !!!')
+#============OPPOOL===============49
+def oppool ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','OPPOOL']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['OPPOOLId'] = df['OPPOOL'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_OPPOOL = df[['BSCId','OPPOOLId','VERSION','operatorWeight_operatorIdentifier_weightFactor','status','last_modified','last_actual_import']]
+    namafile = 'A_OPPOOL.xlsx'
+    A_OPPOOL.to_excel(f'{dirpath}/{namafile}', index=False)
+    print(f'File {namafile} created !!!')
+#============PCU===============50
+def pcu ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','PCU']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['PCUId'] = df['PCU'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_PCU = df[['BSCId','PCUId','VERSION','abisInType',	'bcsuID',	'gbIfType',	'pcuAbisConnectionType',	'pcuID',	'pcuObjectState',	'piuType',	'psei',	'pcuUpToDate','status','last_modified','last_actual_import']]
+    namafile = 'A_PCU.xlsx'
+    A_PCU.to_excel(f'{dirpath}/{namafile}', index=False)
+    print(f'File {namafile} created !!!')
+#============RA===============51
+def ra ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','RA']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['RAId'] = df['RA'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_RA = df[['BSCId','RAId','VERSION','nseiList',	'routingAreaIdLac',	'routingAreaIdMcc',	'routingAreaIdMnc',	'routingAreaIdRac',	'notificationOrigin','status','last_modified','last_actual_import']]
+    namafile = 'A_RA.xlsx'
+    A_RA.to_excel(f'{dirpath}/{namafile}', index=False)
+    print(f'File {namafile} created !!!')
+#============SCHEDULEDITEM===============52
+def scheduleditem ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','AOM','SCHEDULEDITEM']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['AOMId'] = df['AOM'].str.split('-').str.get(1)
+    df['SCHEDULEDITEMId'] = df['SCHEDULEDITEM'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_SCHEDULEDITEM = df[['BSCId','AOMId','SCHEDULEDITEMId','VERSION','IsActive',	'MeasurementType',	'StartDate',	'TimePeriod_day_EndTime_id_interval_StartTime',	'AddlParam_ParameterName_ParameterValue',	'StopDate','status','last_modified','last_actual_import']]
+    namafile = 'A_SCHEDULEDITEM.xlsx'
+    A_SCHEDULEDITEM.to_excel(f'{dirpath}/{namafile}', index=False)
+    print(f'File {namafile} created !!!')
+#============TID===============53
+def tid ():
+    data = pd.read_csv(path)
+    df = pd.DataFrame(data)
+    df[['PLMN','BSC','TID']] = df['DISTNAME'].str.split('/', expand=True)
+    df['BSCId'] = df['BSC'].str.split('-').str.get(1)
+    df['TIDId'] = df['TID'].str.split('-').str.get(1)
+    df['status'] = 'ACTUAL'
+    df['last_modified'] = df['DATETIME']
+    df['last_actual_import'] = df['DATETIME']
+    A_TID = df[['BSCId','TIDId','VERSION','ioTextValue','status','last_modified','last_actual_import']]
+    namafile = 'A_TID.xlsx'
+    A_TID.to_excel(f'{dirpath}/{namafile}', index=False)
+    print(f'File {namafile} created !!!')
+
+for name in os.listdir(dirpath):
+    path = os.path.join(dirpath, name)
+    if path.endswith('.csv') and os.path.isfile(path):
+        if name == 'BTS.csv':
+            bts()
+        if name == 'ADCE.csv':
+            adce()
+        if name == 'TRX.csv':
+            trx()
+        if name == 'ADJL.csv':
+            adjl()
+        if name == 'ADJW.csv':
+            adjw()
+        if name == 'ABDELM.csv':
+            abdelm()
+        if name == 'ANTL.csv':
+            antl()
+        if name == 'BCF.csv':
+            bcf()
+        if name == 'BTSNE.csv':
+            btsne()
+        if name == 'ETHLK.csv':
+            ethlk()
+        if name == 'ETHPRO.csv':
+            ethpro()
+        if name == 'ETHPRT.csv':
+            ethprt()
+        if name == 'ETHQOS.csv':
+            ethqos()
+        if name == 'ETHSLC.csv':
+            ethslc()
+        if name == 'GPC.csv':
+            gpc()
+        if name == 'HOC.csv':
+            hoc()
+        if name == 'HW.csv':
+            hw()
+        if name == 'LCELC.csv':
+            lcelc()
+        if name == 'LCELL.csv':
+            lcell()
+        if name == 'LNCEL.csv':
+            lncel()
+        if name == 'PABTRS.csv':
+            pabtrs()
+        if name == 'POC.csv':
+            poc()
+        if name == 'PUNIT.csv':
+            punit()
+        if name == 'RMOD.csv':
+            rmod()
+        if name == 'SCFVER.csv':
+            scfver()
+        if name == 'SCTP.csv':
+            sctp()
+        if name == 'SMOD.csv':
+            smod()
+        if name == 'SUBRACK.csv':
+            subrack()
+        if name == 'SYNC.csv':
+            sync()
+        if name == 'TRE.csv':
+            tre()
+        if name == 'TRENE.csv':
+            trene()
+        if name == 'UNIT.csv':
+            unit()
+        if name == 'ABMAP.csv':
+            abmap()
+        if name == 'ABTER.csv':
+            abter()
+        if name == 'BAL.csv':
+            bal()
+        if name == 'BSC.csv':
+            bsc()
+        if name == 'CABINET.csv':
+            cabinet()
+        if name == 'CARTRIDGE.csv':
+            cartridge()
+        if name == 'DAP.csv':
+            dap()
+        if name == 'ETP.csv':
+            etp()
+        if name == 'FUUNIT.csv':
+            fuunit()
+        if name == 'LAPD.csv':
+            lapd()
+        if name == 'LUAC.csv':
+            luac()
+        if name == 'MAL.csv':
+            mal()
+        if name == 'MBAL.csv':
+            mbal()
+        if name == 'NSE.csv':
+            nse()
+        if name == 'NSVL.csv':
+            nsvl()
+        if name == 'OPERTR.csv':
+            opertr()
+        if name == 'OPPOOL.csv':
+            oppool()
+        if name == 'PCU.csv':
+            pcu()
+        if name == 'RA.csv':
+            ra()
+        if name == 'SCHEDULEDITEM.csv':
+            scheduleditem()
+        if name == 'TID.csv':
+            tid()
